@@ -2,8 +2,14 @@ import { Text, View, StyleSheet, Image, useWindowDimensions } from "react-native
 import Title from "../components/ui/Title";
 import Color from "../constants/Color";
 import PrimaryButton from "../components/ui/PrimaryButton";
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-function GameOverScreen({ roundCount, userNumber, onStartNewGame }) {
+function GameOverScreen() {
+    const route = useRoute();
+    const navigation = useNavigation();
+    const userNumber = route.params.userNumber;
+    const roundCount = route.params.roundCount;
+
     const { width, height } = useWindowDimensions();
     let imageSize = 300;
     if (width < 380) {
@@ -18,6 +24,11 @@ function GameOverScreen({ roundCount, userNumber, onStartNewGame }) {
         height: imageSize,
         borderRadius: imageSize / 2
     }
+
+    function onStartNewGame() {
+        navigation.replace('StartGame');
+    }
+    
     return (
         <View style={styles.rootContainer}>
             <Title>Game is Over!</Title>
@@ -28,7 +39,7 @@ function GameOverScreen({ roundCount, userNumber, onStartNewGame }) {
             </View>
             <Text style={styles.summaryText}>
                 It took <Text style={styles.highlightText}>{roundCount}</Text> guesses to find
-                <Text style={styles.highlightText}> {userNumber}</Text>.
+                <Text style={styles.highlightText}> {userNumber}</Text>
             </Text>
             <PrimaryButton onPress={onStartNewGame}>Start New Game</PrimaryButton>
         </View>
@@ -56,13 +67,13 @@ const styles = StyleSheet.create({
     },
     summaryText: {
         fontFamily: 'open-sans',
-        fontSize: 23,
+        fontSize: 22,
         marginBottom: 18,
         textAlign: 'center',
     },
     highlightText: {
         fontFamily: 'open-sans-bold',
         color: Color.primary500,
-        fontSize: 32,
+        fontSize: 24,
     }
 });

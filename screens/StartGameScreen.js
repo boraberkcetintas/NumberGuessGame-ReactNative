@@ -8,8 +8,10 @@ import Color from "../constants/Color";
 import Title from "../components/ui/Title";
 import Card from "../components/ui/Card";
 import InstructionText from "../components/ui/InstructionText";
+import { useNavigation } from '@react-navigation/native';
 
 function StartGameScreen({ onConfirmHandler }) {
+    const navigation = useNavigation();
     const [enteredNumber, setEnteredNumber] = useState('');
     const { width, height } = useWindowDimensions();
 
@@ -29,8 +31,13 @@ function StartGameScreen({ onConfirmHandler }) {
                     style: 'destructive',
                 }]
             );
+        } else {
+            navigation.replace('Game', {
+                userNumber: number
+            });
+            setEnteredNumber('');
         }
-        onConfirmHandler(number);
+        //onConfirmHandler(number);
     }
 
     function resetInputHandler() {
@@ -73,7 +80,7 @@ function StartGameScreen({ onConfirmHandler }) {
 
 const styles = StyleSheet.create({
     screen: {
-        flex:1,
+        flex: 1,
     },
     mainContainer: {
         flex: 1,

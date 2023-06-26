@@ -9,79 +9,68 @@ import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
 
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
 export default function App() {
-  const [validNumber, setValidNumber] = useState(null);
-  const [gameIsOver, setGameIsOver] = useState(false);
-  const [roundCount, setRoundCount] = useState(null);
+    const [fontsLoaded] = useFonts({
+        'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+        'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
+    });
 
-  const [fontsLoaded] = useFonts({
-    'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
-    'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
-  });
+    if (!fontsLoaded) {
+        return <AppLoading />
+    }
 
-  if (!fontsLoaded) {
-    return <AppLoading />
-  }
-
-  function onConfirmHandler(validNumber) {
-    setValidNumber(validNumber);
-  }
-
-  function onGameIsOverHandler(roundCount) {
-    setGameIsOver(true);
-    setRoundCount(roundCount);
-  }
-
-  function onStartNewGame() {
-    setValidNumber(null);
-    setRoundCount(0);
-    setGameIsOver(false);
-  }
-
-  let screen = <StartGameScreen onConfirmHandler={onConfirmHandler} />
-
-  if (validNumber) {
-    screen = <GameScreen
-      userNumber={validNumber}
-      onGameIsOver={onGameIsOverHandler} />
-  }
-
-  if (gameIsOver) {
-    screen = <GameOverScreen
-      roundCount={roundCount}
-      userNumber={validNumber}
-      onStartNewGame={onStartNewGame}
-    />
-  }
-
-  return (
-    <>
-      <StatusBar style='light' />
-      <LinearGradient
-        colors={[Color.primary500, Color.primary550]}
-        style={styles.rootScreen}
-      >
-        <ImageBackground
-          source={require('./assets/images/background.jpg')}
-          style={styles.rootScreen}
-          imageStyle={styles.backgroundImage}
-          resizeMode='cover'
+    return <>
+        <StatusBar style='light' />
+        <LinearGradient
+            colors={[Color.primary500, Color.primary550]}
+            style={styles.rootScreen}
         >
-          <SafeAreaView style={styles.rootScreen}>
-            {screen}
-          </SafeAreaView>
-        </ImageBackground>
-      </LinearGradient>
+            <ImageBackground
+                source={require('./assets/images/background.jpg')}
+                style={styles.rootScreen}
+                imageStyle={styles.backgroundImage}
+                resizeMode='cover'
+            >
+                <SafeAreaView style={styles.rootScreen}>
+                    <NavigationContainer>
+                        <Stack.Navigator
+                            screenOptions={{
+                                headerShown: false,
+                                contentStyle: { backgroundColor: 'transparent' },
+                                animation:'slide_from_right'
+                            }}
+                        >
+                            <Stack.Screen
+                                name='StartGame'
+                                component={StartGameScreen}
+                            />
+                            <Stack.Screen
+                                name='Game'
+                                component={GameScreen}
+                            />
+                            <Stack.Screen
+                                name='GameOver'
+                                component={GameOverScreen}
+                            />
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </SafeAreaView>
+            </ImageBackground>
+        </LinearGradient>
     </>
-  )
-
 }
 
+
 const styles = StyleSheet.create({
-  rootScreen: {
-    flex: 1,
-  },
-  backgroundImage: {
-    opacity: 0.15,
-  }
+    rootScreen: {
+        flex: 1,
+    },
+    backgroundImage: {
+        opacity: 0.15,
+    }
 });

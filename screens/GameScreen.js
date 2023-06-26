@@ -7,6 +7,7 @@ import Card from "../components/ui/Card";
 import InstructionText from "../components/ui/InstructionText";
 import { Entypo } from '@expo/vector-icons';
 import GuessLogItem from "../components/game/GuessLogItem";
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 function generateRandomBetween(min, max, exclude) {
     const rndNum = Math.round(Math.random() * (max - min)) + min;
@@ -28,11 +29,20 @@ function directionIsValid(direction, currentGuess, userNumber) {
 let minBoundry = 1;
 let maxBoundry = 100;
 
-function GameScreen({ userNumber, onGameIsOver }) {
+function GameScreen() {
+
+    useEffect(() => {
+        minBoundry = 1;
+        maxBoundry = 100;
+    }, [])
+
     const initGuess = generateRandomBetween(minBoundry, maxBoundry, userNumber);
     const [currentGuess, setCurrentGuess] = useState(initGuess);
     const [guessRounds, setGuessRounds] = useState([initGuess]);
     const { width, height } = useWindowDimensions();
+    const route = useRoute();
+    const navigation = useNavigation();
+    const userNumber = route.params.userNumber;
 
     function nextGuessHandler(direction) {
         if (directionIsValid(direction, currentGuess, userNumber)) {
@@ -43,7 +53,7 @@ function GameScreen({ userNumber, onGameIsOver }) {
             }
             const nextGuess = generateRandomBetween(minBoundry, maxBoundry, currentGuess);
             setCurrentGuess(nextGuess);
-            setGuessRounds(guessRounds => [nextGuess, ...guessRounds]);
+            setGuessRounds((guessRounds) => [nextGuess, ...guessRounds]);
         } else {
             Alert.alert('Misleading!', "This is wrong.", [{ text: 'Sorry!', style: "cancel" }])
         }
@@ -51,14 +61,17 @@ function GameScreen({ userNumber, onGameIsOver }) {
 
     useEffect(() => {
         if (currentGuess === userNumber) {
-            onGameIsOver(guessRounds.length);
+            //onGameIsOver(guessRounds.length);
+            navigation.replace('GameOver', {
+                userNumber: userNumber,
+                roundCount: guessRounds.length
+            });
+            minBoundry = 1;
+            maxBoundry = 100;
         }
-    }, [currentGuess]);
+    }, [currentGuess, userNumber]);
 
-    useEffect(() => {
-        minBoundry = 1;
-        maxBoundry = 100;
-    }, [])
+
 
     const guessRoundsListLength = guessRounds.length;
     const marginTopDistance = height < 400 ? 20 : 100;
@@ -105,7 +118,7 @@ function GameScreen({ userNumber, onGameIsOver }) {
     }
 
     return (
-        <View style={[styles.mainContainer, {marginTop: marginTopDistance}]} >
+        <View style={[styles.mainContainer, { marginTop: marginTopDistance }]} >
             <Title>Opponent's Guess</Title>
             {content}
             <View style={styles.listContainer}>
@@ -141,7 +154,7 @@ const styles = StyleSheet.create({
     buttonsContainerWide: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems:'center'
+        alignItems: 'center'
     },
     buttonContainer: {
         flex: 1,
